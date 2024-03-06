@@ -18,6 +18,5 @@ manifest:
     - name: memfault-firmware-sdk
       path: modules/lib/memfault-firmware-sdk
       url: https://github.com/memfault/memfault-firmware-sdk
-      # Note: normally this would be pinned to a specific SDK tag instead of
-      # master
-      revision: master
+      # Note: normally this would be pinned to a specific SDK tag
+      revision: 1.7.1+zephyr3.7

@@ -230,9 +230,15 @@ static void wait_for_net_up(void) {
 
   // print out the IP address
   char addr_str[NET_IPV4_ADDR_LEN];
-  LOG_INF("IP Address: %s",
-          net_addr_ntop(AF_INET, &iface->config.ip.ipv4->unicast[0].address.in_addr, addr_str,
-                        sizeof(addr_str)));
+  LOG_INF("IP Address: %s", net_addr_ntop(AF_INET,
+  // the interface ip address structure was changed in zephyr commit
+  // 1b0f9e865e35a6b3e1ca8aad7a67f7cfbfc2e666
+#if MEMFAULT_ZEPHYR_VERSION_GT(2, 6)
+                                          &iface->config.ip.ipv4->unicast[0].ipv4.address.in_addr,
+#else
+                                          &iface->config.ip.ipv4->unicast[0].address.in_addr,
+#endif
+                                          addr_str, sizeof(addr_str)));
 }
 #include "memfault/ports/zephyr/http.h"
 
