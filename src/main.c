@@ -14,6 +14,8 @@
 #include MEMFAULT_ZEPHYR_INCLUDE(kernel.h)
 #include MEMFAULT_ZEPHYR_INCLUDE(logging/log.h)
 #include MEMFAULT_ZEPHYR_INCLUDE(shell/shell.h)
+#include <zephyr/net/net_if.h>
+#include <zephyr/net/dhcpv4.h>
 
 #include "cdr.h"
 #include "memfault/components.h"
@@ -37,6 +39,14 @@ static void *heap_ptrs[4] = { NULL };
 //! Keep a reference to the main thread for stack info
 static struct k_thread *s_main_thread = NULL;
 #endif  // CONFIG_ZEPHYR_MEMFAULT_EXAMPLE_MEMORY_METRICS
+
+#if defined(CONFIG_MEMFAULT_HTTP_ENABLE)
+MEMFAULT_STATIC_ASSERT(sizeof(CONFIG_MEMFAULT_PROJECT_KEY) > 1,
+                       "Please set CONFIG_MEMFAULT_PROJECT_KEY in prj.conf");
+sMfltHttpClientConfig g_mflt_http_client_config = {
+  .api_key = CONFIG_MEMFAULT_PROJECT_KEY,
+};
+#endif  // CONFIG_MEMFAULT_HTTP_ENABLE
 
 // Blink code taken from the zephyr/samples/basic/blinky example.
 static void blink_forever(void) {
@@ -185,7 +195,6 @@ SHELL_CMD_REGISTER(memory_metrics, NULL, "Collects runtime memory metrics from a
 // and print current metric values
 void memfault_metrics_heartbeat_collect_data(void) {
   prv_collect_main_thread_stack_free();
-  memfault_metrics_heartbeat_debug_print();
 }
 
 //! Helper function to demonstrate changes in stack metrics
@@ -203,7 +212,32 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *esf) {
 }
 #endif
 
+static void wait_for_net_up(void) {
+  struct net_if *iface = net_if_get_default();
+
+  if (net_if_flag_is_set(iface, NET_IF_DORMANT)) {
+    LOG_INF("Waiting for interface to be up");
+    while (!net_if_is_up(iface)) {
+      k_sleep(K_MSEC(100));
+    }
+  }
+
+  LOG_INF("Starting DHCP to obtain IP address");
+  net_dhcpv4_start(iface);
+  (void)net_mgmt_event_wait_on_iface(iface, NET_EVENT_IPV4_DHCP_BOUND, NULL, NULL, NULL, K_FOREVER);
+
+  LOG_INF("Network is up");
+
+  // print out the IP address
+  char addr_str[NET_IPV4_ADDR_LEN];
+  LOG_INF("IP Address: %s",
+          net_addr_ntop(AF_INET, &iface->config.ip.ipv4->unicast[0].address.in_addr, addr_str,
+                        sizeof(addr_str)));
+}
+#include "memfault/ports/zephyr/http.h"
+
 int main(void) {
+  printk(MEMFAULT_BANNER_COLORIZED);
   LOG_INF("👋 Memfault Demo App! Board %s\n", CONFIG_BOARD);
   memfault_device_info_dump();
 
@@ -212,6 +246,9 @@ int main(void) {
 #if !defined(CONFIG_MEMFAULT_RECORD_REBOOT_ON_SYSTEM_INIT)
   memfault_zephyr_collect_reset_info();
 #endif
+
+  wait_for_net_up();
+  memfault_zephyr_port_install_root_certs();
 
 #if CONFIG_ZEPHYR_MEMFAULT_EXAMPLE_MEMORY_METRICS
   s_main_thread = k_current_get();

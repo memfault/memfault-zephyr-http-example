@@ -10,7 +10,7 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 target_sources(app PRIVATE src/main.c src/cdr.c)
 zephyr_include_directories(config)
-project(rt1024-memfault LANGUAGES C VERSION 1.0.0)
+project(memfault-zephyr-http-example LANGUAGES C VERSION 1.0.0)
 
 # Generate a git hash that's used as part of the software_version, eg
 # 1.0.0+12345678. Permit overriding at command line for CI builds.

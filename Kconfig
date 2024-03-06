@@ -21,6 +21,12 @@ config ZEPHYR_MEMFAULT_EXAMPLE_SOFTWARE_VERSION
     help
       The software version to report to Memfault.
 
+config MEMFAULT_PROJECT_KEY
+    string "Memfault Project Key"
+    depends on MEMFAULT_HTTP_ENABLE
+    help
+      The project key for the Memfault project to report to.
+
 endmenu
 
 source "Kconfig.zephyr"
