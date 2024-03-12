@@ -212,7 +212,9 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *esf) {
 }
 #endif
 
-static void wait_for_net_up(void) {
+#include "memfault/ports/zephyr/http.h"
+static void initialize_net(void) {
+#if defined(CONFIG_NETWORKING)
   struct net_if *iface = net_if_get_default();
 
   if (net_if_flag_is_set(iface, NET_IF_DORMANT)) {
@@ -233,14 +235,16 @@ static void wait_for_net_up(void) {
   LOG_INF("IP Address: %s", net_addr_ntop(AF_INET,
   // the interface ip address structure was changed in zephyr commit
   // 1b0f9e865e35a6b3e1ca8aad7a67f7cfbfc2e666
-#if MEMFAULT_ZEPHYR_VERSION_GT(2, 6)
+  #if MEMFAULT_ZEPHYR_VERSION_GT(3, 6)
                                           &iface->config.ip.ipv4->unicast[0].ipv4.address.in_addr,
-#else
+  #else
                                           &iface->config.ip.ipv4->unicast[0].address.in_addr,
-#endif
+  #endif
                                           addr_str, sizeof(addr_str)));
+
+  memfault_zephyr_port_install_root_certs();
+#endif  // CONFIG_NETWORKING
 }
-#include "memfault/ports/zephyr/http.h"
 
 int main(void) {
   printk(MEMFAULT_BANNER_COLORIZED);
@@ -253,8 +257,7 @@ int main(void) {
   memfault_zephyr_collect_reset_info();
 #endif
 
-  wait_for_net_up();
-  memfault_zephyr_port_install_root_certs();
+  initialize_net();
 
 #if CONFIG_ZEPHYR_MEMFAULT_EXAMPLE_MEMORY_METRICS
   s_main_thread = k_current_get();
