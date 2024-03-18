@@ -20,6 +20,7 @@ After setting up a [Zephyr build environment](https://docs.zephyrproject.org/lat
 ❯ west build --pristine=always --board mimxrt1024_evk \
   memfault-zephyr-http-example \
   -- \
+  -DEXTRA_CONF_FILE=\"overlay-http.conf\" \
   -DCONFIG_MEMFAULT_PROJECT_KEY=\"MEMFAULT_PROJECT_KEY\"
 ```
 
