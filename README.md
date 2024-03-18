@@ -5,7 +5,7 @@ A basic HTTP-enabled Memfault example application.
 Currently supporting the following boards:
 
 - MIMXRT1024-EVK
-- [WIP] FRDM-MCXN947
+- [WIP: no ethernet board support merged yet] FRDM-MCXN947
 
 ## Building
 
@@ -20,8 +20,17 @@ After setting up a [Zephyr build environment](https://docs.zephyrproject.org/lat
 ❯ west build --pristine=always --board mimxrt1024_evk \
   memfault-zephyr-http-example \
   -- \
-  -DEXTRA_CONF_FILE=\"overlay-http.conf\" \
+  -DEXTRA_CONF_FILE=overlay-http.conf \
   -DCONFIG_MEMFAULT_PROJECT_KEY=\"MEMFAULT_PROJECT_KEY\"
+```
+
+To build for the FRDM-MCXN947 board:
+
+```bash
+❯ west build --pristine=always -b frdm_mcxn947/mcxn947/cpu0 \
+  memfault-zephyr-http-example \
+  -- \
+  -DCONFIG_MEMFAULT_PROJECT_KEY=\"$(<~/.memfault-noah-test-project-key)\"
 ```
 
 ## Flashing

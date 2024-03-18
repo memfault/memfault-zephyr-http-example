@@ -217,6 +217,11 @@ static void initialize_net(void) {
 #if defined(CONFIG_NETWORKING)
   struct net_if *iface = net_if_get_default();
 
+  if (!iface) {
+    LOG_ERR("No network interface found");
+    return;
+  }
+
   if (net_if_flag_is_set(iface, NET_IF_DORMANT)) {
     LOG_INF("Waiting for interface to be up");
     while (!net_if_is_up(iface)) {
