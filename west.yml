@@ -5,24 +5,22 @@ manifest:
     - name: zephyr
       # MCX-N support was added here upstream:
       # https://github.com/zephyrproject-rtos/zephyr/commit/e4e463af812e61bb5bfb4b1087d48e1dbcd9d8d5
-      # url: https://github.com/zephyrproject-rtos/zephyr
-      # revision: 47db2e050edc960aa348b802aced9053fb1c7842
-
-      # Temporarily use the downstream fork from NXP which has FRDM-MCXN947
-      # board support enabled
-      url: https://github.com/nxp-zephyr/zephyr
-      revision: release/mcxn94x
+      # And board support was added here:
+      # https://github.com/zephyrproject-rtos/zephyr/commit/8fa1c6d9c6cbc7972f482b17584c48b4ea952e55
+      # Use a commit that's a little later, that seems more stable.
+      url: https://github.com/zephyrproject-rtos/zephyr
+      revision: 369e40b27bca1f08fefe23924f7dc82dd096c53f
 
       import:
         # Limit the Zephyr modules to the required set
         name-allowlist:
           - cmsis
-          - picolibc
           - hal_nxp
           - mbedtls
+          - picolibc
+          - segger # unfortunately required, the NXP boards y-select HAS_SEGGER_RTT
 
     - name: memfault-firmware-sdk
       path: modules/lib/memfault-firmware-sdk
       url: https://github.com/memfault/memfault-firmware-sdk
-      # Note: normally this would be pinned to a specific SDK tag
-      revision: 1.7.1+zephyr3.7
+      revision: "1.7.2"
