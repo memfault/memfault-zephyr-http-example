@@ -215,6 +215,8 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *esf) {
 #include "memfault/ports/zephyr/http.h"
 static void initialize_net(void) {
 #if defined(CONFIG_NETWORKING)
+  memfault_zephyr_port_install_root_certs();
+
   struct net_if *iface = net_if_get_default();
 
   if (!iface) {
