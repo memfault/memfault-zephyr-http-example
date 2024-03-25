@@ -14,6 +14,7 @@
 #include MEMFAULT_ZEPHYR_INCLUDE(kernel.h)
 #include MEMFAULT_ZEPHYR_INCLUDE(logging/log.h)
 #include MEMFAULT_ZEPHYR_INCLUDE(shell/shell.h)
+#include MEMFAULT_ZEPHYR_INCLUDE(drivers/hwinfo.h)
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/dhcpv4.h>
 
@@ -73,9 +74,32 @@ static void blink_forever(void) {
 #endif  // CONFIG_QEMU_TARGET
 }
 
+static const char *prv_get_device_id(void) {
+  uint8_t dev_id[16] = { 0 };
+  static char dev_id_str[sizeof(dev_id) * 2 + 1];
+  static const char *dev_str = "UNKNOWN";
+
+  // Obtain the device id
+  ssize_t length = hwinfo_get_device_id(dev_id, sizeof(dev_id));
+
+  // If this fails for some reason, use a fixed ID instead
+  if (length <= 0) {
+    dev_str = CONFIG_SOC_SERIES "-test";
+    length = strlen(dev_str);
+  } else {
+    // Render the obtained serial number in hexadecimal representation
+    for (size_t i = 0; i < length; i++) {
+      (void)snprintf(&dev_id_str[i * 2], sizeof(dev_id_str), "%02x", dev_id[i]);
+    }
+    dev_str = dev_id_str;
+  }
+
+  return dev_str;
+}
+
 void memfault_platform_get_device_info(sMemfaultDeviceInfo *info) {
   *info = (sMemfaultDeviceInfo){
-    .device_serial = "DEMOSERIAL",
+    .device_serial = prv_get_device_id(),
     .software_type = "zephyr-app",
     .software_version =
       CONFIG_ZEPHYR_MEMFAULT_EXAMPLE_SOFTWARE_VERSION "+" ZEPHYR_MEMFAULT_EXAMPLE_GIT_SHA1,
@@ -249,7 +273,6 @@ static void initialize_net(void) {
   #endif
                                           addr_str, sizeof(addr_str)));
 
-  memfault_zephyr_port_install_root_certs();
 #endif  // CONFIG_NETWORKING
 }
 
