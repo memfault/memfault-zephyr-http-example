@@ -3,14 +3,9 @@
 manifest:
   projects:
     - name: zephyr
-      # MCX-N support was added here upstream:
-      # https://github.com/zephyrproject-rtos/zephyr/commit/e4e463af812e61bb5bfb4b1087d48e1dbcd9d8d5
-      # And board support was added here:
-      # https://github.com/zephyrproject-rtos/zephyr/commit/8fa1c6d9c6cbc7972f482b17584c48b4ea952e55
-      # And this PR as of 2024-03-23 has the ETH QoS driver added, required for
-      # the HTTP example:
       url: https://github.com/zephyrproject-rtos/zephyr
-      revision: refs/pull/70637/head
+      # fixed commit off main
+      revision: 7fc6ef28d3dacad1c1c67791fc645031529d3c64
 
       import:
         # Limit the Zephyr modules to the required set
@@ -24,4 +19,9 @@ manifest:
     - name: memfault-firmware-sdk
       path: modules/lib/memfault-firmware-sdk
       url: https://github.com/memfault/memfault-firmware-sdk
-      revision: "1.7.2"
+      revision: "1.7.6"
+
+    - name: wolfssl
+      path: modules/crypto/wolfssl
+      url: https://github.com/wolfssl/wolfssl
+      revision: v5.7.0-stable
