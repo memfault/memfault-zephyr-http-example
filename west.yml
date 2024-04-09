@@ -18,10 +18,11 @@ manifest:
           - cmsis
           - hal_nxp
           - mbedtls
+          - mcuboot
           - picolibc
           - segger # unfortunately required, the NXP boards y-select HAS_SEGGER_RTT
 
     - name: memfault-firmware-sdk
       path: modules/lib/memfault-firmware-sdk
       url: https://github.com/memfault/memfault-firmware-sdk
-      revision: "1.7.2"
+      revision: "1.7.6+zephyr-hwinfo"

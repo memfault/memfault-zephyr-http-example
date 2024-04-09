@@ -8,7 +8,8 @@ set(BOARD mimxrt1024_evk)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
-target_sources(app PRIVATE src/main.c src/cdr.c)
+add_subdirectory(src)
+
 zephyr_include_directories(config)
 project(memfault-zephyr-http-example LANGUAGES C VERSION 1.0.0)
 
