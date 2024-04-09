@@ -51,14 +51,11 @@ sMfltHttpClientConfig g_mflt_http_client_config = {
 
 // Blink code taken from the zephyr/samples/basic/blinky example.
 static void blink_forever(void) {
-#if CONFIG_QEMU_TARGET
-  k_sleep(K_FOREVER);
-#else
-  /* 1000 msec = 1 sec */
-  #define SLEEP_TIME_MS 1000
+/* 1000 msec = 1 sec */
+#define SLEEP_TIME_MS 1000
 
-  /* The devicetree node identifier for the "led0" alias. */
-  #define LED0_NODE DT_ALIAS(led0)
+/* The devicetree node identifier for the "led0" alias. */
+#define LED0_NODE DT_ALIAS(led0)
 
   static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
@@ -71,7 +68,6 @@ static void blink_forever(void) {
     gpio_pin_toggle_dt(&led);
     k_msleep(SLEEP_TIME_MS);
   }
-#endif  // CONFIG_QEMU_TARGET
 }
 
 static const char *prv_get_device_id(void) {
@@ -239,6 +235,10 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *esf) {
 #include "memfault/ports/zephyr/http.h"
 static void initialize_net(void) {
 #if defined(CONFIG_NETWORKING)
+  #if defined(CONFIG_MEMFAULT_METRICS_CONNECTIVITY_CONNECTED_TIME)
+  memfault_metrics_connectivity_connected_state_change(kMemfaultMetricsConnectivityState_Started);
+  #endif
+
   memfault_zephyr_port_install_root_certs();
 
   struct net_if *iface = net_if_get_default();
@@ -261,6 +261,10 @@ static void initialize_net(void) {
 
   LOG_INF("Network is up");
 
+  #if defined(CONFIG_MEMFAULT_METRICS_CONNECTIVITY_CONNECTED_TIME)
+  memfault_metrics_connectivity_connected_state_change(kMemfaultMetricsConnectivityState_Connected);
+  #endif
+
   // print out the IP address
   char addr_str[NET_IPV4_ADDR_LEN];
   LOG_INF("IP Address: %s", net_addr_ntop(AF_INET,
@@ -275,6 +279,10 @@ static void initialize_net(void) {
 
 #endif  // CONFIG_NETWORKING
 }
+
+// put the blink_forever in its own thread.
+K_THREAD_DEFINE(blink_forever_thread, 1024, blink_forever, NULL, NULL, NULL, K_PRIO_PREEMPT(8), 0,
+                0);
 
 int main(void) {
   printk(MEMFAULT_BANNER_COLORIZED);
@@ -307,8 +315,6 @@ int main(void) {
 #endif
 
   prv_init_test_thread_timer();
-
-  blink_forever();
 
   return 0;
 }
