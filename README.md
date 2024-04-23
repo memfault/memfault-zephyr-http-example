@@ -9,7 +9,16 @@ Currently supporting the following boards:
 
 ## Building
 
-After setting up a [Zephyr build environment](https://docs.zephyrproject.org/latest/getting_started/index.html), you can build the example application with the following commands:
+### Prerequisites
+
+1. A [Zephyr build
+environment](https://docs.zephyrproject.org/latest/getting_started/index.html),
+used to build and flash the firmware
+
+2. A [Memfault account](https://mflt.io/create-key/nxp-imx-rt) and a [project
+   key](https://mflt.io/project-key)
+
+### Initialize the project
 
 ```bash
 # create a new zephyr workspace folder
@@ -17,10 +26,22 @@ After setting up a [Zephyr build environment](https://docs.zephyrproject.org/lat
 ❯ git clone https://github.com/memfault/memfault-zephyr-http-example.git
 ❯ west init -l memfault-zephyr-http-example
 ❯ west update
+```
+
+### Build
+
+Either add this line to [`prj.conf`](prj.conf):
+
+```shell
+CONFIG_MEMFAULT_PROJECT_KEY="MEMFAULT_PROJECT_KEY"
+```
+
+Or set it as a build argument:
+
+```bash
 ❯ west build --pristine=always --board mimxrt1024_evk \
   memfault-zephyr-http-example \
   -- \
-  -DEXTRA_CONF_FILE=overlay-http.conf \
   -DCONFIG_MEMFAULT_PROJECT_KEY=\"MEMFAULT_PROJECT_KEY\"
 ```
 
