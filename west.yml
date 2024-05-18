@@ -3,14 +3,8 @@
 manifest:
   projects:
     - name: zephyr
-      # MCX-N support was added here upstream:
-      # https://github.com/zephyrproject-rtos/zephyr/commit/e4e463af812e61bb5bfb4b1087d48e1dbcd9d8d5
-      # And board support was added here:
-      # https://github.com/zephyrproject-rtos/zephyr/commit/8fa1c6d9c6cbc7972f482b17584c48b4ea952e55
-      # And this PR as of 2024-03-23 has the ETH QoS driver added, required for
-      # the HTTP example:
       url: https://github.com/zephyrproject-rtos/zephyr
-      revision: refs/pull/70637/head
+      revision: main
 
       import:
         # Limit the Zephyr modules to the required set
