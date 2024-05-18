@@ -1,0 +1,7 @@
+common:
+  tags: memfault
+  platform_allow: >
+    mimxrt1024_evk frdm_mcxn947/mcxn947/cpu0
+sample:
+  description: Memfault HTTP Client Example
+  name: memfault-zephyr-http-example
