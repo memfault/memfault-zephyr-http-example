@@ -51,7 +51,7 @@ To build for the FRDM-MCXN947 board:
 ❯ west build --pristine=always -b frdm_mcxn947/mcxn947/cpu0 \
   memfault-zephyr-http-example \
   -- \
-  -DCONFIG_MEMFAULT_PROJECT_KEY=\"$(<~/.memfault-noah-test-project-key)\"
+  -DCONFIG_MEMFAULT_PROJECT_KEY=\"MEMFAULT_PROJECT_KEY\"
 ```
 
 ## Flashing
