@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [mimxrt1024_evk, frdm_mcxn947/mcxn947/cpu0]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: memfault-zephyr-http-example
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: memfault-zephyr-http-example
+          toolchains: arm-zephyr-eabi
+
+      - name: Run twister
+        run: >
+          zephyr/scripts/twister
+          --platform ${{ matrix.board }}
+          --testsuite-root memfault-zephyr-http-example
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: twister-artifacts
+          path: |
+            twister-out/**/*.log
