@@ -5,3 +5,8 @@ common:
 sample:
   description: Memfault HTTP Client Example
   name: memfault-zephyr-http-example
+tests:
+  sample.build:
+    build_only: true
+    extra_configs:
+      - CONFIG_MEMFAULT_PROJECT_KEY="dummy"
