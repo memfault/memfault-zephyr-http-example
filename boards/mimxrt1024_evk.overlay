@@ -1,0 +1,10 @@
+// Enable temperature sensor
+/ {
+	aliases {
+		die-temp0 = &tempmon;
+	};
+};
+
+&tempmon {
+	status = "okay";
+};
